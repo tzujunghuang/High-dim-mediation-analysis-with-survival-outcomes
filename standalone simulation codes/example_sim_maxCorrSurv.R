@@ -13,7 +13,7 @@ num_r = 1;
 cr = '10%'
 # List of (n,p) values to run simulation
 # for full simulation: list(c(500, 100), c(500, 1000), c(500, 1e4), c(500, 1e5), c(500, 1e6))
-np_list = list(c(500, 1e5))
+np_list = list(c(200, 10))
 # List of correlation values between predictors
 rho_val = 0.75
 # List of data generating distributions to use when running simulations
@@ -80,7 +80,7 @@ for (meth in meths_vec) {
             return( t( c( SOSE_est1$ci, SOSE_est1$est, SOSE_est1$se, 
                           SOSE_est1$p_val, elln ) ) ) } ) ) 
         } ) )
-        out$SOSE = SOSE_est
+    out$SOSE = SOSE_est
         
   } else if (meth == 'Naive_OSE') {
         
@@ -119,7 +119,7 @@ for (meth in meths_vec) {
 
 res = res[-1,]
 rownames(res) = 1:nrow(res)
-# To save the simulation result
+# To save the result
 save(res, file = 'dataanalysis_example_maxCorrSurv.Rdata')
 
 
