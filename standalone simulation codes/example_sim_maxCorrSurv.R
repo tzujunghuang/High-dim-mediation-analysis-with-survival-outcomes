@@ -139,10 +139,10 @@ n = np[1]; p = np[2]; rho = rho_val
 for (r in 1:num_r) {  
   for (model in model_list) {
 
-	  dat = Simulate_data(n, p, model, censoring_rate = cr, rho = rho, 
+	  sim_dat = Simulate_data(n, p, model, censoring_rate = cr, rho = rho, 
 	                      bin_prob = 0.5, A.B_effect = 0.2,
 	                      censoring_dist_par = c(0.06, 0.13, 0.24, 0.38))
-	  obj0 <- NumericalStudy$new(input_data = dat)
+	  obj0 <- NumericalStudy$new(input_data = sim_dat)
 	  #print(c(n, p, rho, model, cr))
 	  
 	  out = list()

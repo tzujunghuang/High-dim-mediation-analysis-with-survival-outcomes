@@ -20,8 +20,12 @@ NumericalStudy <- setRefClass( "NumericalStudy",
     # input_Bindex is the label of the selected mediator 
     df = cbind(input_data$X[input_obs], input_data$delta[input_obs], 
                input_data$A[input_obs], input_data$B[input_obs, input_Bindex])
-    df = df[order(df[,1]),]
-    X = df[,1]; delta = df[,2]; A = df[,3]; selectB = df[,4:dim(df)[2]]
+    
+    if (length(input_obs) > 1) {
+      df = df[order(df[,1]),]
+      X = df[,1]; delta = df[,2]; A = df[,3]; selectB = df[,4:dim(df)[2]]
+    } else{ X = df[1]; delta = df[2]; A = df[3]; selectB = df[4:length(df)] }
+    
     res = list(X = X, delta = delta, A = A, selectB = selectB)
     return( res )
   },
@@ -349,7 +353,7 @@ NumericalStudy <- setRefClass( "NumericalStudy",
     
     df1 = subset_data(input_obs = obs1, input_Bindex = B_index)
     X1 = df1$X; delta1 = df1$delta; A1 = df1$A; selectB1 = df1$selectB; rm(df1)
-    
+      
     par_k = Est_Psi_k(B_index, obs = obs0, quar_trunc)
     
     inverse_weight1 = Inverse_weight_func(x0 = X1, obs = obs1, quar_trunc, 
@@ -390,7 +394,7 @@ NumericalStudy <- setRefClass( "NumericalStudy",
     
   Stab_onestep_est = function(all_obs, chunk_size, elln, est_index, alpha, num_top = 1, quar_trunc){ 
     # chunk_size, elln, alpha are scalars.
-    mt = rowMeans( sapply(0:(ceiling((n - elln)/chunk_size) - 1), function(i){
+    mt = rowMeans( sapply(0:(ceiling((n - elln)/chunk_size) - 1), function(i){ print(i)
                   # print(i)
                   old_obs = all_obs[1:(elln + i*chunk_size)]
                   if (i < ceiling((n - elln)/chunk_size) - 1) {
@@ -426,10 +430,18 @@ NumericalStudy <- setRefClass( "NumericalStudy",
       
          curr_sigma_inv0 = 1/sd(rowMeans(IF_star(m = sgn_k0, B_index = k0, obs_all = obs_all_val, 
                                                  obs0 = obs0_val, obs1 = old_obs, quar_trunc)))
-         est0 = mean( (mean(sgn_k0*Psi_k0) 
+         
+         if (length(new_obs) > 1) {
+           est0 = mean( (mean(sgn_k0*Psi_k0) 
                        + rowMeans(IF_star(m = sgn_k0, B_index = k0, obs_all = obs_all_val, 
                                           obs0 = obs0_val, obs1 = new_obs, quar_trunc)))
                        * curr_sigma_inv0 )
+         } else {
+           est0 = mean( (mean(sgn_k0*Psi_k0) 
+                         + mean(IF_star(m = sgn_k0, B_index = k0, obs_all = obs_all_val, 
+                                        obs0 = obs0_val, obs1 = new_obs, quar_trunc)))
+                        * curr_sigma_inv0 )
+         }  
          return( c(est0, curr_sigma_inv0) )  } ) )
        est = mt[1]/mt[2]
        se = 1/(mt[2] * sqrt(n - elln))

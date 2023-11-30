@@ -38,10 +38,13 @@ source('code_maxCorrSurv.R')
 ##### Below X = observed time; delta = censoring status; A = exposure/treatment; B = n X p matrix of pre-standardized mediators
 ##### n: number of subjects and p: number of mediators
 dat = 'Input your data whose format is list(X = X, delta = delta, A = A, B = B)'
+#dat = get(load('test.RData'))
+dat$A = as.vector(dat$A)
 obj0 <- NumericalStudy$new(input_data = dat)
 
 set.seed(2023)
 n = 'Sample size of your data'; p = 'Number of mediators of your data';
+#n = dim(dat$B)[1]; p = dim(dat$B)[2]
 
 res = data.frame(method = NA, n = NA, p = NA, quar = NA, elln = NA, 
                  est = NA, se = NA, lb_ci = NA, ub_ci = NA, p_val = NA)
