@@ -120,7 +120,7 @@ for (meth in meths_vec) {
 res = res[-1,]
 rownames(res) = 1:nrow(res)
 # To save the result
-save(res, file = 'dataanalysis_example_maxCorrSurv.Rdata')
+save(res, file = 'dataanalysis_example_maxMediSurv.Rdata')
 
 
 
@@ -235,4 +235,4 @@ save(sim, file = 'simexample_maxMediSurv.Rdata')
 # se: Standard error of the statistic
 # lb_ci: Lower bound of the confidence interval of the parameter
 # ub_ci: Upper bound of the confidence interval of the parameter
-# p-value: P-value of rejecting the null of no correlation
+# p-value: P-value of rejecting the null of no mediators
