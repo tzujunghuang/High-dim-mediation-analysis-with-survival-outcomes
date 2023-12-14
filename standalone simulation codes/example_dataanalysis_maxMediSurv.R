@@ -30,8 +30,8 @@ for (package in package_list) {
     require(package, character.only = TRUE); library(package, character.only = TRUE) }
 
 # Read in source codes that should be in the same working directory as is this script	
-here::i_am('example_sim_maxCorrSurv.R')
-source('code_maxCorrSurv.R')
+here::i_am('example_sim_maxMediSurv.R')
+source('code_maxMediSurv.R')
 
 
 ##### For data analysis
@@ -110,5 +110,5 @@ for (meth in meths_vec) {
 res = res[-1,]
 rownames(res) = 1:nrow(res)
 # To save the result
-save(res, file = 'dataanalysis_example_maxCorrSurv.Rdata')
+save(res, file = 'dataanalysis_example_maxMediSurv.Rdata')
 

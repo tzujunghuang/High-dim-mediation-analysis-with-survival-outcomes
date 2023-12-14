@@ -43,8 +43,8 @@ for (package in package_list) {
     require(package, character.only = TRUE); library(package, character.only = TRUE) }
 
 # Read in source codes that should be in the same working directory as is this script	
-here::i_am('example_sim_maxCorrSurv.R')
-source('code_maxCorrSurv.R')
+here::i_am('example_sim_maxMediSurv.R')
+source('code_maxMediSurv.R')
 
 
 ##### For data analysis
@@ -220,7 +220,7 @@ proc.time() - t0
 sim = sim[-1,]
 rownames(sim) = 1:nrow(sim)
 # To save the simulation result
-save(sim, file = 'simexample_maxCorrSurv.Rdata')
+save(sim, file = 'simexample_maxMediSurv.Rdata')
 
 
 ##### sim contains the simulation output. Each row contains:
