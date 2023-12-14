@@ -178,7 +178,7 @@ NumericalStudy <- setRefClass( "NumericalStudy",
         a_term = mean_YGhat_mat[i];
         if (i == length(X0)) { 
           selectB = selectB0_A[length(X0)]
-        } else{ selectB = selectB0_A[i:length(X0)] }
+        } else { selectB = selectB0_A[i:length(X0)] }
         
         mean_selectB = ifelse( sum(selectB > 0) == 0, 0, 
                                sum(selectB)/sum(selectB > 0) )
@@ -308,7 +308,6 @@ NumericalStudy <- setRefClass( "NumericalStudy",
                                      obs0 = obs, B_index = k_val, quar_trunc)
         return( sum(integrand*mart_X) ) }
       
-      ##### EXPENSIVE !!!
       d_integral = do.call(cbind, lapply(B_index, function(k){
         AB_mat = cbind(A, selectB[,k], k)
         integral = apply(AB_mat, 1, 'get_integral')
@@ -330,12 +329,15 @@ NumericalStudy <- setRefClass( "NumericalStudy",
       b = as.vector( A*reversed_oddsratios*(Y_Ghat - Ehat_givenA)/(1 - mean_A) )
       c = as.vector( (1 - A)*Ehat_givenA/(1 - mean_A) )
       
-      d_integral = do.call(rbind, lapply(1:length(X), function(j){ 
-        # A rows by 1 cols
-        integrand = get_Ehat_givenAX(A_val = A[j], B_val = selectB[j], obs_all = obs, 
-                                     obs0 = obs, B_index, quar_trunc) 
-        return( sum(integrand*mart_X) ) }))
+      get_integral = function(row){ 
+        a_val = row[1]; b_val = row[2]; k_val = row[3]
+        integrand = get_Ehat_givenAX(A_val = a_val, B_val = b_val, obs_all = obs, 
+                                     obs0 = obs, B_index = k_val, quar_trunc)
+        return( sum(integrand*mart_X) ) }
       
+      ##### EXPENSIVE !!!
+      AB_mat = cbind(A, selectB, B_index)
+      d_integral = as.vector( apply(AB_mat, 1, 'get_integral') )
       d = as.vector( A*(1 - reversed_oddsratios*mean_A/(1 - mean_A))*d_integral/mean_A )
       
       return( round( m*(a - b - c + d - Psi_pars), 3) ) 
@@ -379,11 +381,17 @@ NumericalStudy <- setRefClass( "NumericalStudy",
     
     mart_X = get_martingale(obs = obs_all, obs1 = obs0, quar_trunc)
     
-    integrand = do.call(rbind, lapply(1:length(X1), function(j){ 
-      # A rows by 1 cols
-      get_Ehat_givenAX(A_val = A1[j], B_val = selectB1[j], obs_all, 
-                       obs0, B_index, quar_trunc) }))
-    d_integral = rowSums( integrand*matrix(rep(mart_X, length(X1)), 
+    get_integrand = function(row){ 
+      a_val = row[1]; b_val = row[2]; k_val = row[3]
+      integrand = get_Ehat_givenAX(A_val = a_val, B_val = b_val, obs_all, 
+                                   obs0, B_index = k_val, quar_trunc)
+      return( integrand ) }
+    
+    ##### EXPENSIVE !!!
+    AB_mat = cbind(A1, selectB1, B_index)
+    d_integrand = as.vector( apply(AB_mat, 1, 'get_integrand') )
+    
+    d_integral = rowSums( d_integrand*matrix(rep(mart_X, length(X1)), 
                                            byrow = TRUE, nrow = length(X1)) )
     d = A1*(1 - reversed_oddsratios_selectB1*mean_A0/(1 - mean_A0))*d_integral/mean_A0 
     
@@ -394,7 +402,7 @@ NumericalStudy <- setRefClass( "NumericalStudy",
     
   Stab_onestep_est = function(all_obs, chunk_size, elln, est_index, alpha, num_top = 1, quar_trunc){ 
     # chunk_size, elln, alpha are scalars.
-    mt = rowMeans( sapply(0:(ceiling((n - elln)/chunk_size) - 1), function(i){ print(i)
+    mt = rowMeans( sapply(0:(ceiling((n - elln)/chunk_size) - 1), function(i){
                   # print(i)
                   old_obs = all_obs[1:(elln + i*chunk_size)]
                   if (i < ceiling((n - elln)/chunk_size) - 1) {

@@ -13,11 +13,11 @@ num_r = 1;
 cr = '10%'
 # List of (n,p) values to run simulation
 # for full simulation: list(c(500, 100), c(500, 1000), c(500, 1e4), c(500, 1e5), c(500, 1e6))
-np_list = list(c(200, 10))
+np_list = list(c(200, 1e5))
 # List of correlation values between predictors
 rho_val = 0.75
 # List of data generating distributions to use when running simulations
-model_list = c('N.IE','A1.IE','A2.IE','N.DE','A1.DE','A2.DE')
+model_list = c('A1.IE') #'N.IE','A2.IE','N.DE','A1.DE','A2.DE'
 
 
 ##### Configuration needed 
@@ -26,7 +26,7 @@ num_rdo = 1
 est_index_val = 'whole samples'
 # Methods to run
 ## 'SOSE' is our method; the rest are competing methods though not perfect ones.
-meths_vec = c('Naive_OSE', 'BONF_OSE', 'SOSE')  
+meths_vec = c('SOSE') #'Naive_OSE', 'BONF_OSE' 
 # Tau
 quar = 0.9
 # Significance level
@@ -78,7 +78,7 @@ for (meth in meths_vec) {
                                               alpha = alpha_val, num_top = 1, 
                                               quar_trunc = quar)
             return( t( c( SOSE_est1$ci, SOSE_est1$est, SOSE_est1$se, 
-                          SOSE_est1$p_val, elln ) ) ) } ) ) 
+                          SOSE_est1$p_val, elln ) ) ) } ) )
         } ) )
     out$SOSE = SOSE_est
         
@@ -136,6 +136,8 @@ set.seed(2023)
 np = np_list[[1]]
 n = np[1]; p = np[2]; rho = rho_val
 
+t0 <- proc.time()
+
 for (r in 1:num_r) {  
   for (model in model_list) {
 
@@ -152,8 +154,8 @@ for (r in 1:num_r) {
 	      print(meth) 
 	      SOSE_est = do.call(rbind, lapply(seq(num_rdo), function(rdo_idx){
 	        inds = sample(1:n)
-	        dat0 = list(X = dat$X[1:n][inds], delta = dat$delta[1:n][inds], 
-	                    A = dat$A[1:n][inds], B = dat$B[1:n,1:p][inds,])
+	        dat0 = list(X = sim_dat$X[1:n][inds], delta = sim_dat$delta[1:n][inds], 
+	                    A = sim_dat$A[1:n][inds], B = sim_dat$B[1:n,1:p][inds,])
 	        obj1 <- NumericalStudy$new(input_data = dat0)
 	        
 	        do.call(rbind, lapply(1:length(elln_part), function(d_idx){
@@ -212,6 +214,8 @@ for (r in 1:num_r) {
 	    return( result ) })))
   }
 }
+
+proc.time() - t0
 
 sim = sim[-1,]
 rownames(sim) = 1:nrow(sim)
